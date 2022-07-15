@@ -13,7 +13,7 @@ const getRandomCoords = () => {
 
 const inicialState = {
     food: getRandomCoords(),
-    speed: 500,
+    speed: 200,
     pause: false,
     play: false,
     gameOver: "",
