@@ -1,10 +1,10 @@
-import { useState } from "react";
-import Game from "../components/Game";
+import { useState } from 'react';
+import Game from '../components/Game';
 
 export default function Home() {
   const [play, setPlay] = useState(false);
   function statusPlay() {
-    setPlay(play ? false : true)
+    setPlay(play ? false : true);
   }
 
   return (
@@ -13,5 +13,5 @@ export default function Home() {
         <Game />
       </div>
     </div>
-  )
+  );
 }
