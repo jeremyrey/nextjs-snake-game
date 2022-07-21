@@ -1,191 +1,187 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 import Food from '../components/Food';
 import Snake from '../components/Snake';
+import useInterval from '../hooks/useInterval';
 import InfoScore from './InfoScore';
 
 const getRandomCoords = () => {
-  let min = 1;
-  let max = 90;
-  let x = Math.floor((Math.random() * (max - min + 1) + min) / 2) * 2;
-  let y = Math.floor((Math.random() * (max - min + 1) + min) / 2) * 2;
-  return [x, y];
-};
+  let min = 1
+  let max = 90
+  let x = Math.floor((Math.random() * (max - min + 1) + min) / 2) * 2
+  let y = Math.floor((Math.random() * (max - min + 1) + min) / 2) * 2
+  return [x, y]
+}
 
-const inicialState = {
-  food: getRandomCoords(),
-  speed: 200,
-  pause: false,
-  play: false,
-  gameOver: '',
-  direction: 'RIGHT',
-  snakeDots: [
-    [0, 0],
-    [2, 0],
-  ],
-};
-
-class Game extends React.Component {
-  state = inicialState;
-
-  componentDidMount(): void {
-    setInterval(this.moveSnake, this.state.speed);
-    document.onkeydown = this.onKeyDown;
-  }
-
-  componentDidUpdate(
-    prevProps: Readonly<{}>,
-    prevState: Readonly<{}>,
-    snapshot?: any
-  ): void {
-    this.checkIfOutOfBorders();
-    this.checkIfCollapsed();
-    this.checkIfEat();
-  }
-
-  onKeyDown = (e: any) => {
-    e = e || window.event;
-    switch (e.keyCode) {
-      case 38:
-        this.setState({ direction: 'UP' });
-        break;
-      case 40:
-        this.setState({ direction: 'DOWN' });
-        break;
-      case 37:
-        this.setState({ direction: 'LEFT' });
-        break;
-      case 39:
-        this.setState({ direction: 'RIGHT' });
-        break;
+export default function Game() {
+    const [speed, setSpeed] = useState<number>(200)
+    const [food, setFood] = useState<number[]>(getRandomCoords())
+    const [play, setPlay] = useState(false)
+    const [pause, setPause] = useState(false)
+    const [gameOver, setGameOver] = useState('')
+    const [direction, setDirection] = useState("RIGHT")
+    const [snake, setSnake] = useState<[number[], number[]]>([[0, 0],[2, 0]])
+    
+  // EQ ComponentDidMount
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
     }
-    //console.log(this.state.direction)
-  };
+  }, [])
 
-  moveSnake = () => {
-    let dots = [...this.state.snakeDots];
-    let head = dots[dots.length - 1];
-
-    switch (this.state.direction) {
-      case 'RIGHT':
-        head = [head[0] + 2, head[1]];
-        break;
-      case 'LEFT':
-        head = [head[0] - 2, head[1]];
-        break;
-      case 'DOWN':
-        head = [head[0], head[1] + 2];
-        break;
-      case 'UP':
-        head = [head[0], head[1] - 2];
-        break;
-    }
-    if (!this.state.pause && this.state.play) {
-      dots.push(head);
-      dots.shift();
-      this.setState({
-        snakeDots: dots,
-      });
-    }
-  };
-
-  checkIfOutOfBorders() {
-    let head = this.state.snakeDots[this.state.snakeDots.length - 1];
-    if (head[0] >= 100 || head[1] >= 100 || head[0] < 0 || head[1] < 0) {
-      this.onGameOver();
-    }
-  }
-
-  checkIfCollapsed() {
-    let snake = [...this.state.snakeDots];
-    let head = snake[snake.length - 1];
-    snake.pop();
-    snake.forEach((dot) => {
-      if (head[0] == dot[0] && head[1] == dot[1]) {
-        this.onGameOver();
+  const handleKeyDown = (e: KeyboardEvent) => {
+    switch (e.key) {
+        case 'ArrowRight':
+            setDirection('RIGHT')
+          break
+        case "ArrowUp":
+            setDirection("UP")
+          break
+        case 'ArrowDown':
+            setDirection('DOWN')
+          break
+        case 'ArrowLeft':
+            setDirection('LEFT')
+          break
+        default:
+            console.error('Error with handleKeyDown')
       }
-    });
+}
+
+  const resetStates = () => {
+    setSpeed(200)
+    setFood(getRandomCoords())
+    setPlay(false)
+    setPause(false)
+    setGameOver('')
+    setDirection('RIGHT')
+    setSnake([[0, 0],[2, 0]])
   }
 
-  checkIfEat() {
-    let head = this.state.snakeDots[this.state.snakeDots.length - 1];
-    let food = this.state.food;
+  useInterval(() => {
+    // Your custom logic here
+    moveSnake();
+  }, speed);
+
+  useEffect(() => {
+    checkIfOutOfBorders()
+    checkIfCollapsed()
+    checkIfEat()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [snake])
+
+  const moveSnake = () => {
+    let _snake : [number[], number[]] = [...snake]
+    let head = _snake[_snake.length - 1]
+    switch (direction) {
+      case 'RIGHT':
+        head = [head[0] + 2, head[1]]
+        break
+      case 'LEFT':
+        head = [head[0] - 2, head[1]]
+        break
+      case 'DOWN':
+        head = [head[0], head[1] + 2]
+        break
+      case 'UP':
+        head = [head[0], head[1] - 2]
+        break
+    }
+    if (!pause && play) {
+        _snake.push(head)
+        _snake.shift()
+      setSnake(_snake)
+    }
+  }
+
+  const checkIfOutOfBorders = () => {
+    let _snake : [number[], number[]] = [...snake]
+    let head = _snake[_snake.length - 1]
+    if (head[0] >= 100 || head[1] >= 100 || head[0] < 0 || head[1] < 0) {
+      onGameOver()
+    }
+  }
+
+  const checkIfCollapsed = () => {
+    let _snake : [number[], number[]] = [...snake]
+    let head = _snake[_snake.length - 1]
+    _snake.pop()
+    _snake.forEach((dot) => {
+      if (head[0] == dot[0] && head[1] == dot[1]) {
+        onGameOver()
+      }
+    })
+  }
+
+  const checkIfEat = () => {
+    let _snake : [number[], number[]] = [...snake]
+    let head = _snake[_snake.length - 1]
     if (head[0] == food[0] && head[1] == food[1]) {
-      this.setState({
-        food: getRandomCoords(),
-      });
-      this.enlargeSnake();
-      this.increaseSpeed();
+      setFood(getRandomCoords())
+      enlargeSnake()
+      increaseSpeed()
     }
   }
 
-  enlargeSnake() {
-    let newSnake = [...this.state.snakeDots];
-    newSnake.unshift([]);
-    this.setState({
-      snakeDots: newSnake,
-    });
+  const enlargeSnake = () => {
+    let _snake : [number[], number[]] = [...snake]
+    _snake.unshift([])
+    setSnake(_snake)
   }
 
-  increaseSpeed() {
-    if (this.state.speed > 10) {
-      this.setState({
-        speed: this.state.speed - 10,
-      });
+  const increaseSpeed = () => {
+    if (speed > 10) {
+        setSpeed(speed - 10)
     }
   }
 
-  onGameOver() {
-    this.setState(inicialState);
-    this.setState({
-      gameOver: `Game Over! Your Score was ${this.state.snakeDots.length} Try Again`,
-    });
+  const onGameOver = () => {
+    resetStates()
+    setGameOver(`Game Over! Your Score was ${snake.length} Try Again`)
   }
 
-  render() {
     return (
       <div>
         <div className="flex my-2 justify-center">
           <button
             className="rounded-md w-32 px-2 py-1 bg-slate-700 text-white"
             onClick={() => {
-              if (this.state.play) {
-                this.setState(inicialState);
-              } else this.setState({ play: true });
+              if (play) {
+                resetStates()
+              } else setPlay(true)
             }}
           >
-            {this.state.play ? 'End Game' : 'Play Game'}
+            {play ? 'End Game' : 'Play Game'}
           </button>
-          {this.state.play ? (
+          {play ? (
             <button
               className="ml-2 rounded-md w-32 px-2 py-1 bg-slate-700 text-white"
               onClick={() => {
-                this.setState({ pause: this.state.pause ? false : true });
+                setPause(!pause)
               }}
             >
-              {this.state.pause ? 'Return Game' : 'Pause Game'}
+              {pause ? 'Return Game' : 'Pause Game'}
             </button>
           ) : (
             <></>
           )}
         </div>
-        {this.state.play ? (
+        {play ? (
           <div
             className={`game-area ${
-              this.state.pause ? 'bg-gray-500' : 'bg-gray-200'
+              pause ? 'bg-gray-500' : 'bg-gray-200'
             } rounded-lg`}
           >
-            <Snake snakeDots={this.state.snakeDots} />
-            <Food dot={this.state.food} />
-            <InfoScore score={this.state.snakeDots.length} />
+            <Snake snakeDots={snake} />
+            <Food dot={food} />
+            <InfoScore score={snake.length} />
           </div>
         ) : (
           <div className="text-white font-bold flex items-center">
-            {this.state.gameOver}
+            {gameOver}
           </div>
         )}
       </div>
-    );
-  }
+    )
+  
 }
-
-export default Game;

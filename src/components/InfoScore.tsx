@@ -1,20 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import useLocalStorage from '../hooks/useLocalStorage';
 
-interface InfoScoreProps {
-  score: number;
-}
-
-export default function InfoScore(props: InfoScoreProps) {
+export default function InfoScore({score}) {
   const [bestScore, setBestScore] = useLocalStorage('bestScore', 0);
   useEffect(() => {
-    if (props.score > bestScore) {
-      setBestScore(props.score);
+    if (score > bestScore) {
+      setBestScore(score);
     }
-  }, [props.score]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [score]);
   return (
     <div className="opacity-30 p-2">
-      <p className="font-bold">Current Score: {props.score}</p>
+      <p className="font-bold">Current Score: {score}</p>
       <p className="font-bold">Best Score: {bestScore}</p>
     </div>
   );

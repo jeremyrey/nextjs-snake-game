@@ -1,11 +1,6 @@
-import { useState } from 'react';
 import Game from '../components/Game';
 
 export default function Home() {
-  const [play, setPlay] = useState(false);
-  function statusPlay() {
-    setPlay(play ? false : true);
-  }
 
   return (
     <div>

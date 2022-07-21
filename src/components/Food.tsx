@@ -1,11 +1,7 @@
-interface FoodProps {
-  dot: number[];
-}
-
-export default function Food(props: FoodProps) {
+export default function Food({dot}) {
   const styleFood = {
-    left: `${props.dot[0]}%`,
-    top: `${props.dot[1]}%`,
+    left: `${dot[0]}%`,
+    top: `${dot[1]}%`,
   };
   return <div className="snake-food" style={styleFood}></div>;
 }

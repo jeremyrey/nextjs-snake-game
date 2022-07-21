@@ -1,11 +1,7 @@
-interface SnakeProps {
-  snakeDots: number[][];
-}
-
-export default function Snake(props: SnakeProps) {
+export default function Snake({snakeDots}) {
   return (
     <div>
-      {props.snakeDots.map((dot, index) => {
+      {snakeDots.map((dot, index) => {
         const styleDot = {
           left: `${dot[0]}%`,
           top: `${dot[1]}%`,
