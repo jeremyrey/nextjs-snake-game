@@ -33,7 +33,6 @@ a {
   height: 2%;
   background-color: #000;
   border: 1px solid #fff;
-  border-radius: 50%;
 }
 
 .snake-food {
@@ -42,5 +41,4 @@ a {
   height: 2%;
   background-color: red;
   border: 1px solid #fff;
-  border-radius: 50%;
 }
